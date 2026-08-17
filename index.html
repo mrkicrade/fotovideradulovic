@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&amp;family=Spectral:ital,wght@0,400;0,500;0,600;1,400;1,500&amp;display=swap">
+<style>
+:root{
+  --ivory:#f4f0e9; --paper:#faf7f1; --ink:#1c1a16; --graphite:#26231e;
+  --muted:#6d675c; --hair:rgba(28,26,22,.14); --gold:#a98b53; --gold-soft:#b89a63;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--ivory);color:var(--ink);font-family:"Archivo",system-ui,sans-serif;-webkit-font-smoothing:antialiased;text-wrap:pretty}
+h1,h2,h3,h4{margin:0}
+a{color:inherit;text-decoration:none}
+::selection{background:rgba(169,139,83,.28)}
+.serif{font-family:"Spectral",Georgia,serif;font-weight:500;letter-spacing:.005em}
+.kick{font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);font-weight:600}
+.rs-nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;gap:32px;padding:22px clamp(20px,5vw,64px);transition:background .4s,padding .4s,color .4s;color:#fff}
+.rs-nav.scrolled{background:rgba(250,247,241,.94);backdrop-filter:blur(10px);color:var(--ink);padding-top:14px;padding-bottom:14px;border-bottom:1px solid var(--hair)}
+.rs-nav a.rs-link{font-size:13px;letter-spacing:.06em;position:relative;opacity:.9;transition:opacity .25s;white-space:nowrap}
+.rs-nav a.rs-link:hover{opacity:1}
+.rs-nav a.rs-link::after{content:"";position:absolute;left:0;right:100%;bottom:-6px;height:1px;background:currentColor;transition:right .3s}
+.rs-nav a.rs-link:hover::after{right:0}
+.rs-photo{overflow:hidden;position:relative;display:block}
+.rs-photo>img{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;max-width:none!important;object-fit:cover!important;display:block;z-index:0;transition:transform .9s cubic-bezier(.2,.7,.2,1)}
+.rs-photo:hover>img{transform:scale(1.06)}
+.rs-introphoto>img{opacity:0;transform:scale(1.09);transition:opacity 1.3s ease,transform 1.6s cubic-bezier(.2,.7,.2,1)}
+.rs-introphoto.in>img{opacity:1;transform:scale(1)}
+.rs-ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:16px;color:var(--muted);font-size:13px;letter-spacing:.04em;pointer-events:none}
+.rs-photo image-slot{transition:transform .9s cubic-bezier(.2,.7,.2,1);display:block;width:100%;height:100%}
+.rs-photo:hover image-slot{transform:scale(1.05)}
+.btn{display:inline-flex;align-items:center;gap:10px;font-family:"Archivo";font-size:13px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;padding:15px 26px;cursor:pointer;border:1px solid transparent;transition:background .3s,color .3s,border-color .3s;background:none}
+.btn-solid{background:var(--ink);color:var(--paper)}
+.btn-solid:hover{background:var(--gold);color:#fff}
+.btn-line{border-color:currentColor;color:inherit}
+.btn-line:hover{background:currentColor}
+.btn-line.on-dark:hover{color:var(--ink)}
+.btn-line.rs-introbtn:hover{background:var(--gold);border-color:var(--gold);color:var(--paper)}
+.btn-line.on-light:hover{color:var(--paper)}
+.rs-nav .rs-navcta:hover{background:var(--gold);color:#fff;border-color:var(--gold)}
+.rs-herosolid{background:var(--paper);color:var(--ink)}
+.rs-herosolid:hover{background:var(--gold);color:#fff}
+.rs-heroline{color:#fff;border-color:#fff}
+.rs-heroline:hover{background:var(--gold);color:#fff;border-color:var(--gold)}
+[data-reveal]{opacity:0;transform:translateY(26px);transition:opacity 1s ease,transform 1s cubic-bezier(.2,.7,.2,1)}
+[data-reveal].in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){[data-reveal]{opacity:1;transform:none;transition:none}}
+.rs-filter{background:none;border:0;font-family:"Archivo";font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);cursor:pointer;padding:8px 2px;position:relative;transition:color .3s}
+.rs-filter:hover{color:var(--ink)}
+.rs-filter.active{color:var(--ink)}
+.rs-filter.active::after{content:"";position:absolute;left:0;right:0;bottom:-2px;height:1px;background:var(--gold)}
+.rs-gitem{opacity:1;transition:opacity .5s}
+.rs-lb{position:fixed;inset:0;z-index:200;background:rgba(20,18,15,.96);display:none;align-items:center;justify-content:center;opacity:0;transition:opacity .4s}
+.rs-lb.open{display:flex;opacity:1}
+.rs-lb-img{max-width:88vw;max-height:82vh;object-fit:contain;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+.rs-lb-btn{position:absolute;background:none;border:0;color:rgba(255,255,255,.7);cursor:pointer;transition:color .25s;padding:16px}
+.rs-lb-btn:hover{color:#fff}
+.rs-menu{position:fixed;inset:0;z-index:150;background:var(--graphite);color:var(--paper);display:flex;flex-direction:column;justify-content:center;padding:0 clamp(24px,8vw,80px);transform:translateY(-100%);transition:transform .5s cubic-bezier(.6,.05,.2,1);gap:6px}
+.rs-menu.open{transform:none}
+.rs-menuclose{position:absolute;top:20px;right:20px;background:none;border:0;color:var(--paper);cursor:pointer;padding:10px;line-height:0}
+@media(max-width:600px){.rs-menucontacts{flex-wrap:nowrap!important;gap:14px!important;font-size:11px!important;letter-spacing:.06em!important;white-space:nowrap}}
+.rs-burger{display:none;flex-direction:column;gap:5px;background:none;border:0;cursor:pointer;padding:6px;margin-left:auto}
+.rs-burger span{width:26px;height:2px;background:currentColor;display:block;transition:transform .3s,opacity .3s}
+@media(max-width:860px){.rs-nav .rs-link,.rs-nav .rs-navcta{display:none}.rs-burger{display:flex}}
+.rs-top{position:fixed;right:22px;bottom:22px;z-index:120;width:48px;height:48px;display:flex;align-items:center;justify-content:center;background:var(--ink);color:var(--paper);border:0;cursor:pointer;opacity:0;transform:translateY(14px);pointer-events:none;transition:opacity .35s,transform .35s,background .3s}
+.rs-top.show{opacity:1;transform:none;pointer-events:auto}
+.rs-top:hover{background:var(--gold)}
+@media(max-width:600px){
+  .rs-g2,.rs-g3{grid-template-columns:1fr!important}
+  .rs-g3tiles,.rs-g4{grid-template-columns:repeat(2,1fr)!important}
+  .rs-g4{grid-template-columns:1fr!important}
+  .rs-proces{text-align:center}
+  .rs-proces [data-reveal]{max-width:none!important}
+  .rs-proces h2,.rs-proces .kick{margin-left:auto!important;margin-right:auto!important}
+  .rs-proces h2{max-width:22ch!important}
+  #o-meni{text-align:center}
+  #o-meni h2,#o-meni p{margin-left:auto!important;margin-right:auto!important}
+  #o-meni [style*="repeat(3, auto)"],#o-meni [style*="repeat(3,auto)"]{justify-content:center!important}
+  #o-meni .rs-introphoto{order:2;margin-top:clamp(28px,6vw,48px);max-width:none!important;width:auto!important;justify-self:stretch!important;margin-left:calc(-1 * clamp(20px,5vw,64px))!important;margin-right:calc(-1 * clamp(20px,5vw,64px))!important}
+  #o-meni{padding-bottom:0!important;overflow-x:clip}
+  .rs-emocontent{text-align:center}
+  .rs-emocontent p{margin-left:auto!important;margin-right:auto!important}
+  .rs-utisci{text-align:center}
+  .rs-utisci [data-reveal]{max-width:none!important}
+  .rs-utisci h2,.rs-utisci .kick{margin-left:auto!important;margin-right:auto!important}
+  .rs-utisci h2{max-width:24ch!important}
+  .rs-faqhead{text-align:center}
+  .rs-faqhead h2,.rs-faqhead p{margin-left:auto!important;margin-right:auto!important}
+  #kontakt .rs-g2 > div:first-child{text-align:center}
+  #kontakt h2,#kontakt .rs-g2 > div:first-child p{margin-left:auto!important;margin-right:auto!important}
+  .rs-gfoot{text-align:center}
+  .rs-gfoot p{margin-left:auto!important;margin-right:auto!important}
+  .rs-gfoot [style*="flex-direction: column"],.rs-gfoot [style*="flex-direction:column"]{align-items:center!important}
+  #o-meni .rs-g2 > div,#kontakt .rs-g2 > div{min-width:0}
+  #o-meni h2,#kontakt .rs-g2 > div:first-child h2{max-width:20ch!important}
+  #galerija [data-reveal]:first-child{flex-direction:column!important;align-items:center!important}
+  #galerija [data-reveal]:first-child > div{width:100%}
+  #kontakt .rs-g2 > div:first-child a{padding-left:0!important;padding-right:0!important}
+  #kontakt .rs-g2 > div:first-child a .serif{font-size:15px!important}
+  #kontakt .rs-g2 > div:first-child a > span:first-child{font-size:10px!important}
+  .rs-g3tiles{grid-template-columns:1fr!important;margin-left:calc(-1 * clamp(20px,5vw,64px))!important;margin-right:calc(-1 * clamp(20px,5vw,64px))!important}
+  #usluge{text-align:center;padding-bottom:0!important}
+  #usluge [data-reveal]{max-width:none!important}
+  #usluge h2,#usluge .kick{margin-left:auto!important;margin-right:auto!important}
+  #usluge h2{max-width:20ch!important}
+  .rs-g4>*{min-width:0}
+  .rs-g4>div{padding-left:18px!important;padding-right:18px!important}
+  .rs-gform,.rs-gfoot{grid-template-columns:1fr!important}
+  [data-rs-gallery]{column-count:1!important;margin-left:calc(-1 * clamp(20px,5vw,64px))!important;margin-right:calc(-1 * clamp(20px,5vw,64px))!important}
+  #galerija{text-align:center;padding-bottom:0!important}
+  #galerija [data-rs-filters]{justify-content:center!important;flex-wrap:nowrap!important;gap:12px!important;overflow-x:visible!important;width:100%!important}
+  #galerija [data-rs-filters] .rs-filter{white-space:nowrap;flex:0 0 auto;font-size:10px!important;letter-spacing:.08em!important;padding:8px 0!important}
+  #galerija h2,#galerija .kick{margin-left:auto!important;margin-right:auto!important}
+  #galerija h2{max-width:20ch!important}
+  #pocetna{height:78vh!important;min-height:500px!important}
+  .rs-herocontent{text-align:center}
+  .rs-herocontent h1,.rs-herocontent p{margin-left:auto!important;margin-right:auto!important}
+  .rs-herobtns{flex-direction:column!important;align-items:center!important}
+  .rs-herobtns .btn{width:100%!important;max-width:300px!important;justify-content:center!important}
+  .rs-introgrid{text-align:center}
+  .rs-introgrid .kick{display:inline-block}
+  .rs-introgrid h2,.rs-introgrid p{margin-left:auto!important;margin-right:auto!important}
+  .rs-introgrid .rs-introphoto{max-width:none!important;width:auto!important;justify-self:stretch!important;margin-left:calc(-1 * clamp(20px,5vw,64px))!important;margin-right:calc(-1 * clamp(20px,5vw,64px))!important;aspect-ratio:4/5!important}
+  section:has(> .rs-introgrid){padding-bottom:0!important}
+}
+.acc-item{border-top:1px solid var(--hair)}
+.acc-q{width:100%;text-align:left;background:none;border:0;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:24px;padding:26px 0;font-family:"Spectral",Georgia,serif;font-size:clamp(21px,2.4vw,27px);font-weight:500;color:var(--ink)}
+.acc-plus{flex:none;width:22px;height:22px;position:relative;transition:transform .35s}
+.acc-plus::before,.acc-plus::after{content:"";position:absolute;background:var(--gold);inset:0;margin:auto}
+.acc-plus::before{width:100%;height:1.5px}.acc-plus::after{height:100%;width:1.5px}
+.acc-item.open .acc-plus{transform:rotate(135deg)}
+.acc-a{max-height:0;overflow:hidden;transition:max-height .45s ease}
+.acc-a p{margin:0 0 26px;color:var(--muted);font-size:16px;line-height:1.75;max-width:64ch}
+.field-lbl{display:block;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:9px}
+.field-in{width:100%;background:var(--paper);border:1px solid var(--hair);padding:14px 15px;font-family:"Archivo";font-size:15px;color:var(--ink);transition:border-color .3s}
+.field-in:focus{outline:none;border-color:var(--gold)}
+</style>
+</helmet>
+
+<nav class="rs-nav" data-rs-nav="">
+  <a href="#pocetna" class="serif" style="font-size:22px;font-weight:600;letter-spacing:.02em;margin-right:auto">Foto video Radulović</a>
+  <a href="#pocetna" class="rs-link">Početna</a>
+  <a href="#o-meni" class="rs-link">O meni</a>
+  <a href="#usluge" class="rs-link">Usluge</a>
+  <a href="#galerija" class="rs-link">Galerija</a>
+  <a href="#ponuda" class="rs-link">Ponuda</a>
+  <a href="#kontakt" class="rs-link">Kontakt</a>
+  <a href="#kontakt" class="btn btn-line on-light rs-navcta" style="padding:11px 20px">Pošalji upit</a>
+  <button class="rs-burger" data-rs-burger="" aria-label="Meni"><span></span><span></span><span></span></button>
+</nav>
+
+<div class="rs-menu" data-rs-menu="">
+  <button class="rs-menuclose" data-rs-menuclose="" aria-label="Zatvori meni"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+  <a href="#o-meni" class="serif" data-rs-mlink="" style="font-size:clamp(34px,7vw,58px);padding:8px 0">O meni</a>
+  <a href="#usluge" class="serif" data-rs-mlink="" style="font-size:clamp(34px,7vw,58px);padding:8px 0">Usluge</a>
+  <a href="#galerija" class="serif" data-rs-mlink="" style="font-size:clamp(34px,7vw,58px);padding:8px 0">Galerija</a>
+  <a href="#ponuda" class="serif" data-rs-mlink="" style="font-size:clamp(34px,7vw,58px);padding:8px 0">Ponuda</a>
+  <a href="#kontakt" class="serif" data-rs-mlink="" style="font-size:clamp(34px,7vw,58px);padding:8px 0">Kontakt</a>
+  <div class="rs-menucontacts" style="margin-top:36px;display:flex;gap:24px;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:rgba(250,247,241,.6)">
+    <a href="https://www.instagram.com/foto_video_radulovic/" target="_blank" rel="noopener">Instagram</a>
+    <a href="https://www.facebook.com/fotovideoradulovic/?locale=sr_RS" target="_blank" rel="noopener">Facebook</a>
+    <a href="tel:0000000000">0XX XXX XXX</a>
+  </div>
+</div>
+
+<!-- HERO -->
+<header id="pocetna" style="position:relative;height:100vh;min-height:600px;overflow:hidden">
+  <div style="position:absolute;inset:0"><image-slot id="rs-hero" shape="rect" fit="cover" placeholder="Naslovna fotografija — atmosferičan kadar sa proslave (pejzažni, visoka rezolucija)"></image-slot><img src="./min-hero3-msstwygl-ca8q.jpg" alt="hero" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block"></div>
+  <div style="position:absolute;inset:0;pointer-events:none;background:rgba(0,0,0,.48)"></div>
+  <div style="position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(18,16,13,.55) 0%,rgba(18,16,13,.05) 32%,rgba(18,16,13,.15) 60%,rgba(18,16,13,.78) 100%)"></div>
+  <div style="position:absolute;left:0;right:0;bottom:0;padding:0 clamp(20px,5vw,64px) clamp(48px,7vw,92px);color:#fff">
+    <div class="rs-herocontent" style="max-width:1400px;margin:0 auto">
+      <span class="kick" style="color:rgba(255,255,255,.85)">Fotografija &amp; video · Svadbe · Krštenja · Dron snimci</span>
+      <h1 class="serif" style="font-size:clamp(48px,9vw,132px);line-height:.98;font-weight:500;letter-spacing:-.01em;margin:22px 0 0;max-width:16ch">Trenuci koji ostaju zauvek.</h1>
+      <p style="font-size:clamp(16px,1.5vw,19px);line-height:1.6;max-width:46ch;margin:26px 0 0;color:rgba(255,255,255,.9)">Fotografija vaših najlepših trenutaka — prirodno, iskreno i sa osećajem.</p>
+      <div class="rs-herobtns" style="display:flex;gap:14px;flex-wrap:wrap;margin-top:38px">
+        <a href="#galerija" class="btn rs-herosolid">Pogledaj galeriju</a>
+        <a href="#kontakt" class="btn btn-line rs-heroline">Zakažite fotografisanje</a>
+      </div>
+    </div>
+  </div>
+  <div style="position:absolute;left:50%;bottom:26px;transform:translateX(-50%);color:rgba(255,255,255,.7);font-size:10px;letter-spacing:.3em;text-transform:uppercase;pointer-events:none">Skrolujte</div>
+</header>
+
+<!-- INTRO / FILOZOFIJA -->
+<section style="padding:clamp(44px,5.5vw,80px) clamp(20px,5vw,64px)">
+  <div class="rs-g2 rs-introgrid" style="max-width:1400px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(32px,6vw,90px);align-items:center">
+    <div data-reveal="">
+      <span class="kick">Vaš trenutak. Vaša priča.</span>
+      <h2 class="serif" style="font-size:clamp(30px,4.4vw,58px);line-height:1.08;font-weight:500;margin:24px 0 0;max-width:16ch">Svaka proslava ima svoju priču.</h2>
+      <p style="font-size:17px;line-height:1.8;color:var(--muted);margin:28px 0 0;max-width:52ch">Moj posao je da je zabeležim onako kako se zaista dogodila — prirodno, iskreno i bez nepotrebnog poziranja. Fokus je na ljudima, emociji i atmosferi koja se ne ponavlja.</p>
+      <a href="#o-meni" class="btn btn-line on-dark rs-introbtn" style="margin-top:34px">Više o meni</a>
+    </div>
+    <div class="rs-photo rs-introphoto" data-reveal="" style="aspect-ratio:3/4;max-height:560px;justify-self:center;width:100%;max-width:420px"><image-slot id="rs-intro" shape="rect" fit="cover" placeholder="Fotograf u radu ili atmosferičan kadar sa događaja (uspravni format)"></image-slot><img src="./min-studio-msouex46-18dv.jpg" alt="studio" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block"></div>
+  </div>
+</section>
+
+<!-- USLUGE -->
+<section id="usluge" style="padding:clamp(40px,5vw,72px) clamp(20px,5vw,64px);background:var(--paper);border-top:1px solid var(--hair);border-bottom:1px solid var(--hair)">
+  <div style="max-width:1400px;margin:0 auto">
+    <div data-reveal="" style="max-width:640px;margin-bottom:clamp(36px,5vw,64px)">
+      <span class="kick">Šta fotografišem</span>
+      <h2 class="serif" style="font-size:clamp(30px,4.4vw,54px);line-height:1.05;font-weight:500;margin:20px 0 0">Za svaku svečanost, jedan pogled iza objektiva.</h2>
+    </div>
+    <div class="rs-g3tiles" style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px">
+      <div data-goto="Svadbe" class="rs-photo" data-reveal="" style="aspect-ratio:3/4;background:#e8e2d7;cursor:pointer"><span class="rs-ph">Prevuci fotografiju — Svadbe</span><span style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.3) 0%,transparent 40%,rgba(18,16,13,.72) 100%);pointer-events:none;z-index:1"></span><span class="serif" style="position:absolute;left:24px;bottom:22px;color:#fff;font-size:26px;pointer-events:auto;cursor:pointer;z-index:2">Svadbe</span><img src="./min-vencanje-mssv62iu-tr1t.jpg" alt="vencanje"></div>
+      <div data-goto="Porodica" class="rs-photo" data-reveal="" style="aspect-ratio:3/4;background:#e8e2d7;cursor:pointer"><span class="rs-ph">Prevuci fotografiju — Krštenja</span><span style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.3) 0%,transparent 40%,rgba(18,16,13,.72) 100%);pointer-events:none;z-index:1"></span><span class="serif" style="position:absolute;left:24px;bottom:22px;color:#fff;font-size:26px;pointer-events:auto;cursor:pointer;z-index:2">Krštenja</span><img src="./min-marek-studzinski-qu20sihrq-w-unsplash-mssvaq66-j71a.jpg" alt="krstenje"></div>
+      <div data-goto="Proslave" class="rs-photo" data-reveal="" style="aspect-ratio:3/4;background:#e8e2d7;cursor:pointer"><span class="rs-ph">Prevuci fotografiju — Rođendani</span><span style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.3) 0%,transparent 40%,rgba(18,16,13,.72) 100%);pointer-events:none;z-index:1"></span><span class="serif" style="position:absolute;left:24px;bottom:22px;color:#fff;font-size:26px;pointer-events:auto;cursor:pointer;z-index:2">Rođendani</span><img src="./min-rodjendan-mssvb2f1-dzch.jpg" alt="rodjendan"></div>
+      <div data-goto="Events" class="rs-photo" data-reveal="" style="aspect-ratio:3/4;background:#e8e2d7;cursor:pointer"><span class="rs-ph">Prevuci fotografiju — Korporativni događaji</span><span style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.3) 0%,transparent 40%,rgba(18,16,13,.72) 100%);pointer-events:none;z-index:1"></span><span class="serif" style="position:absolute;left:24px;bottom:22px;color:#fff;font-size:26px;pointer-events:auto;cursor:pointer;z-index:2">Korporativni događaji</span><img src="./min-corporate-mssvf0py-zfin.jpg" alt="corporate"></div>
+      <div data-goto="Porodica" class="rs-photo" data-reveal="" style="aspect-ratio:3/4;background:#e8e2d7;cursor:pointer"><span class="rs-ph">Prevuci fotografiju — Porodična fotografija</span><span style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.3) 0%,transparent 40%,rgba(18,16,13,.72) 100%);pointer-events:none;z-index:1"></span><span class="serif" style="position:absolute;left:24px;bottom:22px;color:#fff;font-size:26px;pointer-events:auto;cursor:pointer;z-index:2">Porodična fotografija</span><img src="./min-porodica-mssvh05h-14g1.jpg" alt="porodica"></div>
+      <div data-goto="Proslave" class="rs-photo" data-reveal="" style="aspect-ratio:3/4;background:#e8e2d7;cursor:pointer"><span class="rs-ph">Prevuci fotografiju — Proslave</span><span style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.3) 0%,transparent 40%,rgba(18,16,13,.72) 100%);pointer-events:none;z-index:1"></span><span class="serif" style="position:absolute;left:24px;bottom:22px;color:#fff;font-size:26px;pointer-events:auto;cursor:pointer;z-index:2">Proslave</span><img src="./min-event-mssvko8k-4gmd.jpg" alt="event" width="3648" height="5472" style="max-width: 100%; height: auto; display: block; object-fit: cover; width: 3648px; aspect-ratio: 3648 / 5472"></div>
+    </div>
+  </div>
+</section>
+
+<!-- GALERIJA -->
+<section id="galerija" style="padding:clamp(44px,5.5vw,80px) clamp(20px,5vw,64px)">
+  <div style="max-width:1500px;margin:0 auto">
+    <div data-reveal="" style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:24px;margin-bottom:clamp(32px,4vw,52px)">
+      <div>
+        <span class="kick">Portfolio</span>
+        <h2 class="serif" style="font-size:clamp(30px,4.6vw,60px);line-height:1.18;font-weight:500;margin:18px 0 0;max-width:14ch">Priče ispričane fotografijom</h2>
+      </div>
+      <div data-rs-filters="" style="display:flex;flex-wrap:wrap;gap:22px">
+        <button class="rs-filter active" data-filter="Sve">Sve</button>
+        <button class="rs-filter" data-filter="Svadbe">Svadbe</button>
+        <button class="rs-filter" data-filter="Proslave">Proslave</button>
+        <button class="rs-filter" data-filter="Porodica">Porodica</button>
+        <button class="rs-filter" data-filter="Events">Events</button>
+      </div>
+    </div>
+    <div data-rs-gallery="" style="column-count:3;column-gap:2px">
+      <div class="rs-gitem" data-cat="Svadbe" style="break-inside:avoid;margin-bottom:2px"><div class="rs-photo" data-gi="" style="aspect-ratio:3/4;cursor:pointer;background:#e8e2d7"><span class="rs-ph">Prevuci fotografiju — Svadba</span><img src="./min-svadba2-msow801q-bu6q.jpg" alt="svadba"></div></div>
+      <div class="rs-gitem" data-cat="Proslave" style="break-inside:avoid;margin-bottom:2px"><div class="rs-photo" data-gi="" style="aspect-ratio:1/1;cursor:pointer;background:#e8e2d7"><span class="rs-ph">Prevuci fotografiju — Proslava</span><img src="./min-proslava2-msowih6a-xsno.jpg" alt="proslava"></div></div>
+      <div class="rs-gitem" data-cat="Porodica" style="break-inside:avoid;margin-bottom:2px"><div class="rs-photo" data-gi="" style="aspect-ratio:4/5;cursor:pointer;background:#e8e2d7"><span class="rs-ph">Prevuci fotografiju — Porodica</span><img src="./min-porodica2-msowbfxz-i9s0.jpg" alt="porodica"></div></div>
+      <div class="rs-gitem" data-cat="Svadbe" style="break-inside:avoid;margin-bottom:2px"><div class="rs-photo" data-gi="" style="aspect-ratio:3/2;cursor:pointer;background:#e8e2d7"><span class="rs-ph">Prevuci fotografiju — Svadba</span><img src="./min-svadba4-msow87w4-qo4p.jpg" alt="svadba"></div></div>
+      <div class="rs-gitem" data-cat="Events" style="break-inside:avoid;margin-bottom:2px"><div class="rs-photo" data-gi="" style="aspect-ratio:3/4;cursor:pointer;background:#e8e2d7"><span class="rs-ph">Prevuci fotografiju — Event</span><img src="./min-event2-msowegpm-pfvc.jpg" alt="event"></div></div>
+      <div class="rs-gitem" data-cat="Proslave" style="break-inside:avoid;margin-bottom:2px"><div class="rs-photo" data-gi="" style="aspect-ratio:1/1;cursor:pointer;background:#e8e2d7"><span class="rs-ph">Prevuci fotografiju — Proslava</span><img src="./min-proslava3-msowikwz-ka47.jpg" alt="proslava"></div></div>
+      <div class="rs-gitem" data-cat="Porodica" style="break-inside:avoid;margin-bottom:2px"><div class="rs-photo" data-gi="" style="aspect-ratio:3/4;cursor:pointer;background:#e8e2d7"><span class="rs-ph">Prevuci fotografiju — Porodica</span><img src="./min-porodica3-msowbrdw-vz44.jpg" alt="porodica"></div></div>
+      <div class="rs-gitem" data-cat="Svadbe" style="break-inside:avoid;margin-bottom:2px"><div class="rs-photo" data-gi="" style="aspect-ratio:4/5;cursor:pointer;background:#e8e2d7"><span class="rs-ph">Prevuci fotografiju — Svadba</span><img src="./min-svadba3-msowfovc-egga.jpg" alt="svadba"></div></div>
+      <div class="rs-gitem" data-cat="Events" style="break-inside:avoid;margin-bottom:2px"><div class="rs-photo" data-gi="" style="aspect-ratio:3/2;cursor:pointer;background:#e8e2d7"><span class="rs-ph">Prevuci fotografiju — Event</span><img src="./min-event3-msowerj0-loj1.jpg" alt="event"></div></div>
+      <div class="rs-gitem" data-cat="Svadbe" style="break-inside:avoid;margin-bottom:2px"><div class="rs-photo" data-gi="" style="aspect-ratio:1/1;cursor:pointer;background:#e8e2d7"><span class="rs-ph">Prevuci fotografiju — Svadba</span><img src="./min-svadba2-msowfegq-fbvt.jpg" alt="svadba"></div></div>
+      <div class="rs-gitem" data-cat="Proslave" style="break-inside:avoid;margin-bottom:2px"><div class="rs-photo" data-gi="" style="aspect-ratio:3/4;cursor:pointer;background:#e8e2d7"><span class="rs-ph">Prevuci fotografiju — Proslava</span><img src="./min-proslava4-msowiptd-5j98.jpg" alt="proslava"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- KAKO RADIMO -->
+<section class="rs-proces" style="padding:clamp(44px,5.5vw,80px) clamp(20px,5vw,64px);background:var(--paper);border-top:1px solid var(--hair)">
+  <div style="max-width:1400px;margin:0 auto">
+    <div data-reveal="" style="max-width:600px;margin-bottom:clamp(40px,5vw,72px)">
+      <span class="kick">Kako radimo</span>
+      <h2 class="serif" style="font-size:clamp(28px,4vw,52px);line-height:1.18;font-weight:500;margin:20px 0 0">Od prvog razgovora do vaših fotografija</h2>
+    </div>
+    <div class="rs-g4" style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--hair);border-top:1px solid var(--hair);border-bottom:1px solid var(--hair)">
+      <div data-reveal="" style="background:var(--paper);padding:36px 26px 44px"><span class="serif" style="font-size:44px;color:var(--gold);font-weight:500">01</span><h3 class="serif" style="font-size:24px;font-weight:600;margin:16px 0 0">Dogovor</h3><p style="font-size:15px;line-height:1.7;color:var(--muted);margin:12px 0 0">Razgovaramo o vašem događaju, datumu i vašim željama.</p></div>
+      <div data-reveal="" style="background:var(--paper);padding:36px 26px 44px"><span class="serif" style="font-size:44px;color:var(--gold);font-weight:500">02</span><h3 class="serif" style="font-size:24px;font-weight:600;margin:16px 0 0">Fotografisanje</h3><p style="font-size:15px;line-height:1.7;color:var(--muted);margin:12px 0 0">Na dan proslave fokusiram se na prirodne trenutke, ljude i atmosferu.</p></div>
+      <div data-reveal="" style="background:var(--paper);padding:36px 26px 44px"><span class="serif" style="font-size:44px;color:var(--gold);font-weight:500">03</span><h3 class="serif" style="font-size:24px;font-weight:600;margin:16px 0 0">Obrada</h3><p style="font-size:15px;line-height:1.7;color:var(--muted);margin:12px 0 0">Biram najbolje fotografije i pažljivo ih obrađujem.</p></div>
+      <div data-reveal="" style="background:var(--paper);padding:36px 26px 44px"><span class="serif" style="font-size:44px;color:var(--gold);font-weight:500">04</span><h3 class="serif" style="font-size:24px;font-weight:600;margin:16px 0 0">Isporuka</h3><p style="font-size:15px;line-height:1.7;color:var(--muted);margin:12px 0 0">Gotove fotografije dobijate u digitalnoj galeriji.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- EMOTIVNA SEKCIJA -->
+<section style="position:relative;padding:clamp(60px,10vw,140px) clamp(20px,5vw,64px);overflow:hidden;color:#fff">
+  <div style="position:absolute;inset:0"><image-slot id="rs-emo" shape="rect" fit="cover" placeholder="Snažan emotivan kadar (zagrljaj, osmeh, pogled) — pejzažni"></image-slot><img src="./min-fotograf-msowplfv-ew53.jpg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block"></div>
+  <div style="position:absolute;inset:0;background:rgba(18,16,13,.55);pointer-events:none"></div>
+  <div data-reveal="" class="rs-emocontent" style="position:relative;max-width:1400px;margin:0 auto"><h2 class="serif" style="font-size:clamp(38px,6.5vw,92px);line-height:1.02;font-weight:500">Jedan dan.<br>Stotine trenutaka.<br>Jedna priča.</h2>
+    <p style="font-size:clamp(16px,1.5vw,19px);line-height:1.75;max-width:52ch;margin:34px 0 0;color:rgba(255,255,255,.9)">Ne tražim samo savršenu fotografiju. Tražim onaj pogled, osmeh, zagrljaj i trenutak koji ćete prepoznati i posle mnogo godina.</p>
+  </div>
+</section>
+
+<!-- O FOTOGRAFU -->
+<section id="o-meni" style="padding:clamp(44px,5.5vw,80px) clamp(20px,5vw,64px)">
+  <div class="rs-g2" style="max-width:1400px;margin:0 auto;display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:clamp(32px,6vw,90px);align-items:center">
+    <div class="rs-photo rs-introphoto" data-reveal="" style="aspect-ratio:4/5"><image-slot id="rs-portret" shape="rect" fit="cover" placeholder="Portret fotografa (uspravni format)"></image-slot><img src="./min-nikola-msowrt4m-bpz7.jpg" alt="Nikola"></div>
+    <div data-reveal="">
+      <span class="kick">O meni</span>
+      <h2 class="serif" style="font-size:clamp(30px,4.4vw,56px);line-height:1.05;font-weight:500;margin:22px 0 0">Zdravo, dobrodošli.</h2>
+      <p style="font-size:17px;line-height:1.8;color:var(--muted);margin:26px 0 0;max-width:54ch">Već više od deset godina beležim najvažnije dane u životima svojih klijenata širom Srbije. Počeo sam kao gost sa kamerom na porodičnim slavama, a danas pratim svadbe, krštenja i velike proslave.</p>
+      <p style="font-size:17px;line-height:1.8;color:var(--muted);margin:18px 0 0;max-width:54ch">Radim tiho i nenametljivo — verujem da najbolje fotografije nastaju kada se ljudi opuste i zaborave da ih neko snima. Svaki materijal obrađujem lično. Uz fotografiju radim i video u 4K, a <strong style="color:var(--ink);font-weight:600">dronom beležim kadrove iz vazduha</strong> kakve gost nikada ne vidi.</p>
+      <div style="display:grid;grid-template-columns:repeat(3,auto);gap:36px;justify-content:start;margin-top:44px;border-top:1px solid var(--hair);padding-top:36px">
+        <div><div class="serif" style="font-size:clamp(40px,4vw,56px);font-weight:600;line-height:1;color:var(--ink)">10+</div><div style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:12px">godina iskustva</div></div>
+        <div><div class="serif" style="font-size:clamp(40px,4vw,56px);font-weight:600;line-height:1;color:var(--ink)">500+</div><div style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:12px">ispričanih priča</div></div>
+        <div><div class="serif" style="font-size:clamp(40px,4vw,56px);font-weight:600;line-height:1;color:var(--ink)">1000+</div><div style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:12px">zadovoljnih klijenata</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- UTISCI -->
+<section class="rs-utisci" style="padding:clamp(44px,5.5vw,80px) clamp(20px,5vw,64px);background:var(--graphite);color:var(--paper)">
+  <div style="max-width:1400px;margin:0 auto">
+    <div data-reveal="" style="max-width:700px;margin-bottom:clamp(40px,5vw,72px)">
+      <span class="kick">Utisci</span>
+      <h2 class="serif" style="font-size:clamp(28px,4vw,52px);line-height:1.08;font-weight:500;margin:20px 0 0">Reči ljudi koji su mi poverili svoje trenutke</h2>
+    </div>
+    <div class="rs-g3" style="display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(24px,3vw,48px)">
+      <blockquote data-reveal="" style="margin:0"><p class="serif" style="font-size:clamp(20px,1.7vw,24px);line-height:1.5;font-weight:500;font-style:italic;color:var(--paper)">„Fotografije su čak lepše nego što smo očekivali. Uspeo je da zabeleži trenutke kojih se ni sami nismo sećali.”</p><footer style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:rgba(250,247,241,.55);margin-top:26px">Marija i Nikola — svadba</footer></blockquote>
+      <blockquote data-reveal="" style="margin:0"><p class="serif" style="font-size:clamp(20px,1.7vw,24px);line-height:1.5;font-weight:500;font-style:italic;color:var(--paper)">„Profesionalan od prvog kontakta do predaje. Fotografije sa krštenja su prelepe i stigle su brzo.”</p><footer style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:rgba(250,247,241,.55);margin-top:26px">Porodica Ilić — krštenje</footer></blockquote>
+      <blockquote data-reveal="" style="margin:0"><p class="serif" style="font-size:clamp(20px,1.7vw,24px);line-height:1.5;font-weight:500;font-style:italic;color:var(--paper)">„Snimao je našu proslavu diskretno, a sve najvažnije je zabeleženo. Preporuka bez razmišljanja.”</p><footer style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:rgba(250,247,241,.55);margin-top:26px">Milan P. — proslava</footer></blockquote>
+    </div>
+  </div>
+</section>
+
+<!-- PONUDA -->
+<section id="ponuda" style="padding:clamp(44px,6vw,90px) clamp(20px,5vw,64px)">
+  <div data-reveal="" style="max-width:820px;margin:0 auto;text-align:center">
+    <span class="kick">Paketi i ponuda</span>
+    <h2 class="serif" style="font-size:clamp(32px,5vw,68px);line-height:1.03;font-weight:500;margin:22px 0 0">Svaka proslava je drugačija.</h2>
+    <p style="font-size:18px;line-height:1.75;color:var(--muted);margin:28px auto 0;max-width:50ch">Pošaljite mi datum i nekoliko informacija o vašem događaju i dobićete ponudu prilagođenu vašim potrebama.</p>
+    <a href="#kontakt" class="btn btn-solid" style="margin-top:40px">Zatražite ponudu</a>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section style="padding:clamp(40px,5vw,72px) clamp(20px,5vw,64px);background:var(--paper);border-top:1px solid var(--hair)">
+  <div class="rs-g2" style="max-width:1100px;margin:0 auto;display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:clamp(24px,5vw,72px)">
+    <div data-reveal="" class="rs-faqhead"><span class="kick">Česta pitanja</span><h2 class="serif" style="font-size:clamp(28px,3.4vw,44px);line-height:1.08;font-weight:500;margin:18px 0 0">Odgovori pre rezervacije</h2></div>
+    <div data-rs-acc="" data-reveal="" style="border-bottom:1px solid var(--hair)">
+      <div class="acc-item open"><button class="acc-q">Da li fotografišete van grada?<span class="acc-plus"></span></button><div class="acc-a"><p>Da, snimam događaje širom Srbije, a po dogovoru i u inostranstvu. Za lokacije van grada dodaje se samo putni trošak, koji unapred jasno navodim u ponudi.</p></div></div>
+      <div class="acc-item"><button class="acc-q">Koliko fotografija dobijamo?<span class="acc-plus"></span></button><div class="acc-a"><p>Broj zavisi od trajanja i tipa događaja — za veće proslave to je najčešće 300 do 500+ pažljivo obrađenih fotografija. Uvek predajem izbor najboljih kadrova, ne sve snimljeno.</p></div></div>
+      <div class="acc-item"><button class="acc-q">Koliko traje isporuka fotografija?<span class="acc-plus"></span></button><div class="acc-a"><p>Obrađene fotografije predajem u roku od 14 dana. Kratak izbor najvažnijih kadrova često pošaljem već u prvih nekoliko dana nakon događaja.</p></div></div>
+      <div class="acc-item"><button class="acc-q">Da li dobijamo fotografije u punoj rezoluciji?<span class="acc-plus"></span></button><div class="acc-a"><p>Da. Sve fotografije dobijate u punoj rezoluciji, spremne za štampu, kroz privatnu digitalnu galeriju sa koje ih preuzimate.</p></div></div>
+      <div class="acc-item"><button class="acc-q">Da li radite video?<span class="acc-plus"></span></button><div class="acc-a"><p>Da, uz fotografiju radim i video snimanje u 4K, uključujući snimke dronom. Video i dron se dogovaraju uz sam paket.</p></div></div>
+      <div class="acc-item"><button class="acc-q">Kako rezervisati termin?<span class="acc-plus"></span></button><div class="acc-a"><p>Pošaljite upit preko forme ili me pozovite. Nakon kratkog dogovora, termin se potvrđuje avansom — i vaš datum je rezervisan.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- KONTAKT -->
+<section id="kontakt" style="padding:clamp(44px,5.5vw,80px) clamp(20px,5vw,64px)">
+  <div class="rs-g2" style="max-width:1400px;margin:0 auto;display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:clamp(40px,6vw,90px);align-items:start">
+    <div data-reveal="">
+      <span class="kick">Kontakt</span>
+      <h2 class="serif" style="font-size:clamp(32px,4.6vw,60px);line-height:1.02;font-weight:500;margin:20px 0 0">Recite mi nešto više o vašoj proslavi.</h2>
+      <p style="font-size:16px;line-height:1.75;color:var(--muted);margin:24px 0 0;max-width:44ch">Javljam se u roku od 24 sata sa odgovorom i predlogom ponude.</p>
+      <div style="margin-top:40px;display:flex;flex-direction:column;border-top:1px solid var(--hair)">
+        <a href="tel:0000000000" style="display:flex;justify-content:space-between;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid var(--hair)"><span style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)">Telefon</span><span class="serif" style="font-size:22px;font-weight:600">0XX XXX XXX</span></a>
+        <a data-rs-email="" href="mailto:fotovideoradulovic@gmail.com" style="display:flex;justify-content:space-between;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid var(--hair)"><span style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)">Email</span><span class="serif" style="font-size:22px;font-weight:600;color:var(--ink)">fotovideoradulovic@gmail.com</span></a>
+        <a href="https://www.instagram.com/foto_video_radulovic/" target="_blank" rel="noopener" style="display:flex;justify-content:space-between;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid var(--hair)"><span style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)">Instagram</span><span class="serif" style="font-size:22px;font-weight:600">@fotovideoradulovic</span></a>
+        <a href="https://www.facebook.com/fotovideoradulovic/?locale=sr_RS" target="_blank" rel="noopener" style="display:flex;justify-content:space-between;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid var(--hair)"><span style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)">Facebook</span><span class="serif" style="font-size:22px;font-weight:600">/fotovideoradulovic</span></a>
+      </div>
+    </div>
+    <div data-reveal="">
+      <sc-if value="{{ sent }}" hint-placeholder-val="{{ false }}">
+        <div style="background:var(--paper);border:1px solid var(--hair);padding:clamp(36px,4vw,56px);min-height:380px;display:flex;flex-direction:column;justify-content:center">
+          <span class="serif" style="font-size:clamp(30px,3.4vw,42px);font-weight:500;color:var(--ink)">Hvala na upitu!</span>
+          <p style="font-size:17px;line-height:1.75;color:var(--muted);margin:18px 0 0;max-width:42ch">Vaš zahtev je primljen. Javljam se u roku od 24 sata na kontakt koji ste ostavili.</p>
+          <button type="button" onClick="{{ reset }}" class="btn btn-line on-dark" style="margin-top:34px;align-self:flex-start">Pošalji novi upit</button>
+        </div>
+      </sc-if>
+      <sc-if value="{{ notSent }}" hint-placeholder-val="{{ true }}">
+        <form onSubmit="{{ submit }}" style="background:var(--paper);border:1px solid var(--hair);padding:clamp(28px,3.4vw,48px)">
+          <div class="rs-gform" style="display:grid;grid-template-columns:1fr 1fr;gap:22px">
+            <div><label class="field-lbl" for="rs-ime">Ime i prezime</label><input class="field-in" id="rs-ime" type="text" required="" placeholder="Vaše ime"></div>
+            <div><label class="field-lbl" for="rs-email">Email</label><input class="field-in" id="rs-email" type="email" required="" placeholder="ime@email.com"></div>
+          </div>
+          <div class="rs-gform" style="display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:22px">
+            <div><label class="field-lbl" for="rs-tel">Telefon</label><input class="field-in" id="rs-tel" type="tel" placeholder="06x xxx xxx"></div>
+            <div><label class="field-lbl" for="rs-datum">Datum događaja</label><input class="field-in" id="rs-datum" type="date"></div>
+          </div>
+          <div style="margin-top:22px"><label class="field-lbl" for="rs-tip">Vrsta događaja</label>
+            <select class="field-in" id="rs-tip"><option>Svadba</option><option>Krštenje</option><option>Rođendan</option><option>Porodična proslava</option><option>Godišnjica</option><option>Matursko veče</option><option>Korporativni događaj</option><option>Drugo</option></select>
+          </div>
+          <div style="margin-top:22px"><label class="field-lbl" for="rs-poruka">Poruka</label><textarea class="field-in" id="rs-poruka" rows="4" placeholder="Recite mi nešto više o vašem događaju" style="resize:vertical"></textarea></div>
+          <button type="submit" class="btn btn-solid" style="margin-top:26px;width:100%;justify-content:center">Pošalji upit</button>
+        </form>
+      </sc-if>
+    </div>
+  </div>
+</section>
+
+<!-- FINALNI CTA -->
+<section style="position:relative;overflow:hidden;color:#fff">
+  <div style="position:absolute;inset:0"><image-slot id="rs-cta" shape="rect" fit="cover" placeholder="Velika atmosferična fotografija za završni poziv (pejzažni)"></image-slot><img src="./min-proslava_end-msox1rf6-51lx.jpg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block"></div>
+  <div style="position:absolute;inset:0;background:rgba(18,16,13,.62);pointer-events:none"></div>
+  <div data-reveal="" style="position:relative;max-width:1400px;margin:0 auto;padding:clamp(52px,8vw,110px) clamp(20px,5vw,64px);text-align:center">
+    <h2 class="serif" style="font-size:clamp(34px,5.5vw,80px);line-height:1.02;font-weight:500">Spremni da sačuvate svoju priču?</h2>
+    <p style="font-size:clamp(16px,1.5vw,19px);line-height:1.6;margin:24px auto 0;max-width:40ch;color:rgba(255,255,255,.9)">Recite mi nešto više o vašoj proslavi.</p>
+    <a href="#kontakt" class="btn btn-solid" style="background:var(--paper);color:var(--ink);margin-top:36px">Pošalji upit</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer style="background:var(--graphite);color:rgba(250,247,241,.7);padding:clamp(48px,6vw,80px) clamp(20px,5vw,64px) 40px">
+  <div class="rs-gfoot" style="max-width:1400px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1.4fr) repeat(2,minmax(0,1fr));gap:40px 32px">
+    <div>
+      <div class="serif" style="font-size:26px;font-weight:600;color:var(--paper)">Foto video Radulović</div>
+      <p style="font-size:15px;line-height:1.7;margin:14px 0 0;max-width:34ch">Fotografija koja čuva uspomene.</p>
+    </div>
+    <div>
+      <div style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:rgba(250,247,241,.45);margin-bottom:18px">Navigacija</div>
+      <div style="display:flex;flex-direction:column;gap:11px;font-size:15px">
+        <a href="#pocetna" class="rs-link">Početna</a><a href="#o-meni" class="rs-link">O meni</a><a href="#galerija" class="rs-link">Galerija</a><a href="#ponuda" class="rs-link">Ponuda</a><a href="#kontakt" class="rs-link">Kontakt</a>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:rgba(250,247,241,.45);margin-bottom:18px">Kontakt</div>
+      <div style="display:flex;flex-direction:column;gap:11px;font-size:15px">
+        <a href="tel:0000000000">0XX XXX XXX</a>
+        <a href="mailto:fotovideoradulovic@gmail.com">fotovideoradulovic@gmail.com</a>
+        <a href="https://www.instagram.com/foto_video_radulovic/" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://www.facebook.com/fotovideoradulovic/?locale=sr_RS" target="_blank" rel="noopener">Facebook</a>
+      </div>
+    </div>
+  </div>
+  <div style="max-width:1400px;margin:48px auto 0;padding-top:24px;border-top:1px solid rgba(250,247,241,.14);font-size:12px;letter-spacing:.04em;color:rgba(250,247,241,.45)">© 2026 Foto video Radulović · Sva prava zadržana</div>
+</footer>
+
+<button class="rs-top" data-rs-top="" aria-label="Nazad na vrh"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 19V6M5 12l7-7 7 7"></path></svg></button>
+
+<!-- LIGHTBOX -->
+<div class="rs-lb" data-rs-lb="">
+  <button class="rs-lb-btn" data-lb-close="" style="top:14px;right:14px" aria-label="Zatvori"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+  <button class="rs-lb-btn" data-lb-prev="" style="left:8px;top:50%;transform:translateY(-50%)" aria-label="Prethodna"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25"><path d="M15 5l-7 7 7 7"></path></svg></button>
+  <button class="rs-lb-btn" data-lb-next="" style="right:8px;top:50%;transform:translateY(-50%)" aria-label="Sledeća"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25"><path d="M9 5l7 7-7 7"></path></svg></button>
+  <img class="rs-lb-img" data-lb-img="" alt="">
+  <div data-lb-empty="" class="serif" style="display:none;color:rgba(255,255,255,.85);font-size:24px;text-align:center;padding:40px">Ovde će biti prikazana fotografija.<br><span style="font-size:15px;font-family:Archivo;color:rgba(255,255,255,.55)">Prevucite sliku u polje u galeriji.</span></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { sent: false };
+  renderVals() {
+    return {
+      sent: this.state.sent,
+      notSent: !this.state.sent,
+      submit: (e) => { e.preventDefault(); this.setState({ sent: true }); const k = document.getElementById('kontakt'); if (k) window.scrollTo({ top: k.offsetTop - 70, behavior: 'smooth' }); },
+      reset: () => this.setState({ sent: false }),
+    };
+  }
+  componentDidMount() { this._wire(); }
+  componentDidUpdate() { this._wire(); }
+  _wire() {
+    if (this._wired) return;
+    this._wired = true;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Sticky nav state
+    const nav = document.querySelector('[data-rs-nav]');
+    const onScroll = () => { if (nav) nav.classList.toggle('scrolled', window.scrollY > window.innerHeight * 0.7); };
+    onScroll(); window.addEventListener('scroll', onScroll, { passive: true });
+
+    // Back to top
+    const topBtn = document.querySelector('[data-rs-top]');
+    const onTop = () => { if (topBtn) topBtn.classList.toggle('show', window.scrollY > window.innerHeight * 0.9); };
+    onTop(); window.addEventListener('scroll', onTop, { passive: true });
+    if (topBtn) topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+    // Mobile menu
+    const menu = document.querySelector('[data-rs-menu]');
+    const burger = document.querySelector('[data-rs-burger]');
+    if (burger && menu) {
+      burger.addEventListener('click', () => menu.classList.toggle('open'));
+      const closeBtn = menu.querySelector('[data-rs-menuclose]');
+      if (closeBtn) closeBtn.addEventListener('click', () => menu.classList.remove('open'));
+      menu.querySelectorAll('[data-rs-mlink]').forEach(a => a.addEventListener('click', () => menu.classList.remove('open')));
+    }
+
+    // Scroll reveal
+    const revs = document.querySelectorAll('[data-reveal]');
+    if (reduce) { revs.forEach(el => el.classList.add('in')); }
+    else {
+      const io = new IntersectionObserver((ents) => {
+        ents.forEach(en => { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } });
+      }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+      revs.forEach(el => io.observe(el));
+    }
+
+    // Accordion
+    document.querySelectorAll('[data-rs-acc] .acc-item').forEach(item => {
+      const q = item.querySelector('.acc-q');
+      const a = item.querySelector('.acc-a');
+      const set = () => { a.style.maxHeight = item.classList.contains('open') ? a.scrollHeight + 'px' : '0px'; };
+      set();
+      q.addEventListener('click', () => {
+        const isOpen = item.classList.contains('open');
+        item.parentElement.querySelectorAll('.acc-item').forEach(o => { o.classList.remove('open'); o.querySelector('.acc-a').style.maxHeight = '0px'; });
+        if (!isOpen) { item.classList.add('open'); set(); }
+      });
+    });
+
+    // Gallery filter
+    const gallery = document.querySelector('[data-rs-gallery]');
+    const items = gallery ? Array.from(gallery.querySelectorAll('.rs-gitem')) : [];
+    let current = 'Sve';
+    const applyFilter = (cat) => {
+      current = cat;
+      items.forEach(it => { it.style.display = (cat === 'Sve' || it.dataset.cat === cat) ? '' : 'none'; });
+    };
+    document.querySelectorAll('[data-rs-filters] .rs-filter').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('[data-rs-filters] .rs-filter').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        applyFilter(btn.dataset.filter);
+      });
+    });
+
+    // Category tiles → open matching gallery filter
+    document.querySelectorAll('[data-goto]').forEach(tile => {
+      tile.addEventListener('click', (e) => {
+        if (e.target.closest('image-slot')) return;
+        const cat = tile.dataset.goto;
+        const target = document.querySelector('[data-rs-filters] .rs-filter[data-filter="' + cat + '"]');
+        if (target) target.click();
+        const g = document.getElementById('galerija');
+        if (g) window.scrollTo({ top: g.getBoundingClientRect().top + window.pageYOffset - 20, behavior: 'smooth' });
+      });
+    });
+
+    // Lightbox
+    const lb = document.querySelector('[data-rs-lb]');
+    const lbImg = lb && lb.querySelector('[data-lb-img]');
+    const lbEmpty = lb && lb.querySelector('[data-lb-empty]');
+    let visible = [];
+    let idx = 0;
+    const slotSrc = (item) => {
+      const im = item.querySelector('img');
+      const src = im && im.getAttribute('src');
+      return src || '';
+    };
+    const show = () => {
+      const item = visible[idx];
+      const src = slotSrc(item);
+      if (src) { lbImg.src = src; lbImg.style.display = ''; lbEmpty.style.display = 'none'; }
+      else { lbImg.style.display = 'none'; lbEmpty.style.display = 'block'; }
+    };
+    const open = (item) => {
+      visible = items.filter(it => it.style.display !== 'none');
+      idx = Math.max(0, visible.indexOf(item));
+      show(); lb.classList.add('open'); document.body.style.overflow = 'hidden';
+    };
+    const close = () => { lb.classList.remove('open'); document.body.style.overflow = ''; };
+    const step = (d) => { if (!visible.length) return; idx = (idx + d + visible.length) % visible.length; show(); };
+    items.forEach(it => { const ph = it.querySelector('[data-gi]'); if (ph) ph.addEventListener('click', () => open(it)); });
+    if (lb) {
+      lb.querySelector('[data-lb-close]').addEventListener('click', close);
+      lb.querySelector('[data-lb-prev]').addEventListener('click', (e) => { e.stopPropagation(); step(-1); });
+      lb.querySelector('[data-lb-next]').addEventListener('click', (e) => { e.stopPropagation(); step(1); });
+      lb.addEventListener('click', (e) => { if (e.target === lb) close(); });
+      window.addEventListener('keydown', (e) => {
+        if (!lb.classList.contains('open')) return;
+        if (e.key === 'Escape') close();
+        else if (e.key === 'ArrowRight') step(1);
+        else if (e.key === 'ArrowLeft') step(-1);
+      });
+    }
+  }
+}
+</script>
+</body>
+</html>
